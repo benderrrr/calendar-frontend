@@ -3,7 +3,8 @@ import counterReducer, {
   increment,
   decrement,
   incrementByAmount,
-} from './counterSlice';
+  incrementByFour,
+} from '../../redux/reducers/counter/counterSlice';
 
 describe('counter reducer', () => {
   const initialState: CounterState = {
@@ -30,5 +31,11 @@ describe('counter reducer', () => {
   it('should handle incrementByAmount', () => {
     const actual = counterReducer(initialState, incrementByAmount(2));
     expect(actual.value).toEqual(5);
+  });
+
+  it('should handle increment By 4', () => {
+    const initValue = initialState.value
+    const actual = counterReducer(initialState, incrementByFour());
+    expect(actual.value).toEqual(initValue + 4);
   });
 });

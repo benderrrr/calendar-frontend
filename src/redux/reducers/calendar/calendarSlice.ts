@@ -1,8 +1,9 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {AppThunk, RootState} from '../../store';
 import {IDay, IEventData, IIventsStorage} from "../../../components/monthView/interfaces";
-import {fetchEvents, saveEvent} from "./genericAPI";
-import {getDataKeyFromEvent} from "../../../utils/generic";
+import {fetchEvents, saveEvent, fetchDeleteEvent} from "./calendarAPI";
+import {getDateKeyFromEvent} from "../../../utils/generic";
+import {closeModal} from "../modals/modalsSlice";
 
 export interface GenericState {
   currentMonthDate: Date | null;
@@ -28,10 +29,9 @@ const initialState: GenericState = {
   }
 );*/
 
-export const genericSlice = createSlice({
+export const calendarSlice = createSlice({
   name: 'counter',
   initialState,
-  // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
     changeCurrentMonth: (state, action: PayloadAction<{ date: Date, days: IDay[] }>) => {
       state.currentMonthDate = action.payload.date
@@ -42,32 +42,28 @@ export const genericSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(createEvent.pending, (state) => {
-        //state.backgroundImageStatus = statuses.LOADING
-      })
+      // .addCase(createEvent.pending, (state) => {
+      //   state.backgroundImageStatus = statuses.LOADING
+      // })
       .addCase(createEvent.fulfilled, (state, action) => {
-        const dateKey = getDataKeyFromEvent(action.payload)
-        state.events[dateKey] = {...state.events[dateKey], [action.payload.id]: action.payload}
-/*        console.log(action.payload)
-        const year = action.payload..getFullYear()
-        const month = action.payload.date.getMonth()
-        const dayNumber = action.payload.date.getDate()
-        const */
-        //state.backgroundImageStatus = statuses.IDLE;
-        //state.backgroundImage = action.payload
-      })
-      .addCase(getEvents.pending, (state) => {
-        //state.backgroundImageStatus = statuses.LOADING
+        const dateKey = getDateKeyFromEvent(action.payload)
+        if (action.payload.id) {
+          state.events[dateKey] = {...state.events[dateKey], [action.payload.id]: action.payload}
+        }
       })
       .addCase(getEvents.fulfilled, (state, action) => {
         if (Object.keys(action.payload).length) {
           state.events = action.payload
         }
+      })
+      .addCase(deleteEvent.fulfilled, (state, action: PayloadAction<{ id: string, dateKey: string }>) => {
+        const newEvents = {...state.events}
+        delete newEvents[action.payload.dateKey][action.payload.id]
       });
   },
 });
 
-export const { changeCurrentMonth } = genericSlice.actions;
+export const { changeCurrentMonth } = calendarSlice.actions;
 
 export const selectCurrentMonth = (state: RootState) => ({
   currentMonthDate: state.generic.currentMonthDate,
@@ -115,6 +111,8 @@ export const setCurrentMonth = (date: Date): AppThunk => (
     }
   }
   const days = [...daysFromPrevMonth(), ...daysFromCurrentMonth(), ...daysFromNextMonth()]
+  dispatch(closeModal());
+  dispatch(changeCurrentMonth({ date, days }));
   dispatch(changeCurrentMonth({ date, days }));
   dispatch(getEvents({ start: days[0].date, end: days[days.length - 1].date }));
 };
@@ -134,4 +132,12 @@ export const getEvents = createAsyncThunk(
     }
 );
 
-export default genericSlice.reducer;
+export const deleteEvent = createAsyncThunk(
+    'calendar/deleteEvent',
+    async (payload: {id: string, dateKey: string}) => {
+      await fetchDeleteEvent(payload.id, payload.dateKey);
+      return payload;
+    }
+);
+
+export default calendarSlice.reducer;

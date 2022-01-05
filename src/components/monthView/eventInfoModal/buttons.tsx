@@ -1,112 +1,68 @@
 import React, {useMemo} from 'react';
-import {ClickAwayListener, IconButton, Popper, Typography, Tooltip} from "@mui/material";
+import {IconButton, Tooltip} from "@mui/material";
 
 import './eventInfoModal.css';
-import {IEventData} from "../interfaces";
-import {useAppDispatch} from "../../../redux/hooks";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
+import {useAppDispatch} from "../../../redux/hooks";
+import {IEventData} from "../interfaces";
+import {deleteEvent} from "../../../redux/reducers/calendar/calendarSlice";
+import {getDateKeyFromEvent} from "../../../utils/generic";
+import {modalsTypes, openModal} from "../../../redux/reducers/modals/modalsSlice";
 
 
-interface IEventInfoModal {
-    event: IEventData,
-    onExit: () => void
+interface IInfoModalButtons {
+  onExit: () => void,
+  event: IEventData
 }
 
-const EventInfoModal: React.FC<IEventInfoModal> = ({
-                                                       event,
-                                                       onExit
-                                                   }) => {
-    const dispatch = useAppDispatch();
-    const anchorEl = document.getElementById(event.id)
-    const buttonArray = useMemo(() => [
-        {
-            title: 'Edit',
-            icon: EditIcon,
-            onClick: () => null
-        },
-        {
-            title: 'Delete',
-            icon: DeleteIcon,
-            onClick: () => null
-        },
-        {
-            title: 'Close',
-            icon: CloseIcon,
-            onClick: onExit
-        },
-    ], [onExit])
-    return (
-        <ClickAwayListener onClickAway={onExit}>
-            <Popper
-                anchorEl={anchorEl}
-                open={true}
-                placement='left'
-                disablePortal={false}
-                modifiers={[
-                    {
-                        name: 'flip',
-                        enabled: true,
-                        options: {
-                            altBoundary: true,
-                            rootBoundary: 'document',
-                            padding: 8,
-                        },
-                    },
-                    {
-                        name: 'preventOverflow',
-                        enabled: true,
-                        options: {
-                            altAxis: true,
-                            altBoundary: true,
-                            tether: true,
-                            rootBoundary: 'document',
-                            padding: 8,
-                        },
-                    },
-                    {
-                        name: 'offset',
-                        options: {
-                            offset: [8, 8],
-                        },
-                    },
-                ]}
-            >
-                <div className='event-info-wrapper' id={'event-info'}>
-                    <div className={'buttons'}>
-                        <Tooltip title={'Edit'}>
-                            <IconButton size="small" onClick={() => {}}>
-                                <EditIcon/>
-                            </IconButton>
-                        </Tooltip>
-                        <IconButton size="small" onClick={() => {}}>
-                            <DeleteIcon/>
-                        </IconButton>
-                        <IconButton size="small" onClick={onExit}>
-                            <CloseIcon/>
-                        </IconButton>
-                    </div>
-                    <Typography paragraph sx={{marginBottom: 0}}>
-                        {event.name}
-                    </Typography>
-                    <Typography paragraph sx={{marginBottom: 0}}>
-                        Description: {event.description}
-                    </Typography>
-                    <Typography paragraph sx={{marginBottom: 0}}>
-                        {new Date(event.year, event.month, event.day).toLocaleDateString(navigator.language, {
-                            weekday: 'long',
-                            day: 'numeric',
-                            month: 'long'
-                        })}
-                    </Typography>
-                    <Typography paragraph sx={{marginBottom: 0}}>
-                        Time: {`${event.startTime.hours}:${event.startTime.minutes} - ${event.endTime.hours}:${event.endTime.minutes}`}
-                    </Typography>
-                </div>
-            </Popper>
-        </ClickAwayListener>
-    );
+const InfoModalButtons: React.FC<IInfoModalButtons> = ({
+                                                         onExit,
+                                                         event
+                                                       }) => {
+  const dispatch = useAppDispatch();
+  const buttonArray = useMemo(() => [
+    {
+      title: 'Edit',
+      icon: EditIcon,
+      onClick: () => dispatch(
+        openModal({
+            modalType: modalsTypes.editEvent,
+            modalMetaData: {
+              date: new Date(event.year, event.month, event.day),
+              dateKey: getDateKeyFromEvent(event),
+              eventData: event,
+            }
+          }
+        )
+      )
+    },
+    {
+      title: 'Delete',
+      icon: DeleteIcon,
+      onClick: () => {
+        event.id && dispatch(deleteEvent({id: event.id, dateKey: getDateKeyFromEvent(event)}))
+        onExit()
+      }
+    },
+    {
+      title: 'Close',
+      icon: CloseIcon,
+      onClick: onExit
+    },
+  ], [dispatch, event, onExit])
+  return (
+    <div className={'buttons'}>
+      {buttonArray.map(buttonData => (
+        <Tooltip title={buttonData.title} key={buttonData.title}>
+          <IconButton size="small" onClick={buttonData.onClick}>
+            <buttonData.icon/>
+          </IconButton>
+        </Tooltip>
+      ))}
+    </div>
+  );
 }
 
-export default EventInfoModal;
+export default InfoModalButtons;

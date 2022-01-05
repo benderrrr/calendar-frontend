@@ -1,47 +1,36 @@
-import React, {useEffect, useRef, useState} from 'react';
-import EventNoteIcon from '@mui/icons-material/EventNote';
+import React, {useEffect} from 'react';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
+
+import './monthView.css';
+import Day from "./day/day";
+import {selectDays, setCurrentMonth} from "../../redux/reducers/calendar/calendarSlice";
+import Modals from '../modals';
 
 
-import './NavBar.css';
-import {getBackGroundImage} from "../../redux/reducers/generic/genericSlice";
-import {AppDispatch} from "../../redux/store";
-import {useAppDispatch} from "../../redux/hooks";
-import {listenForOutsideClicks} from "../../utils/generic";
+const MonthView: React.FC = () => {
+  const days = useAppSelector(selectDays);
+  const dispatch = useAppDispatch();
 
-const NavBar: React.FC = () => {
-    const [isColorPicker, setIsColorPicker] = useState<boolean>(false)
-    const [listening, setListening] = useState<boolean>(false);
-    const [readyForSubmitColor, setReadyForSubmitColor] = useState<boolean>(true)
-    const [color, setColor] = useState<string>(localStorage.getItem('bgColor') || "#FFF")
-    const nodeRef = useRef<HTMLDivElement>(null)
-    const colorChooserRef = useRef<HTMLDivElement>(null)
-    const dispatch: AppDispatch = useAppDispatch()
+  useEffect(() => {
+    dispatch(setCurrentMonth(new Date()))
+  }, [dispatch]);
 
-    useEffect(listenForOutsideClicks(
-        listening,
-        setListening,
-        colorChooserRef,
-        setIsColorPicker,
-    ));
-
-    const changeColorHandler = (color: string): void => {
-        setColor(color)
-        localStorage.setItem('bgColor', color)
-    }
-
-    useEffect(() => {
-        readyForSubmitColor && dispatch(getBackGroundImage(color.slice(1)))
-    }, [dispatch, color, readyForSubmitColor])
-
-    return (
-        <nav className='nav-wrapper'>
-
-            <div className='logo'>
-                <EventNoteIcon/>
-                <span>Calendar</span>
-            </div>
-        </nav>
-    );
+  if (!days.length) return null;
+  return (
+    <>
+      <div className='month-view-wrapper'
+           style={{gridTemplateRows: `repeat(${days.length / 7}, calc(100% / ${days.length / 7} )`}}>
+        {days.map((day, index) =>
+          <Day
+            {...day}
+            key={day.date.toJSON()}
+            index={index}
+          />
+        )}
+      </div>
+      <Modals/>
+    </>
+  );
 }
 
-export default NavBar;
+export default MonthView;

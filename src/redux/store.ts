@@ -1,10 +1,17 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+import counterReducer from './reducers/counter/counterSlice';
+import genericReducer from './reducers/calendar/calendarSlice';
+import modalsReducer from './reducers/modals/modalsSlice';
 
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
+    generic: genericReducer,
+    modals: modalsReducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: false
+  }),
 });
 
 export type AppDispatch = typeof store.dispatch;

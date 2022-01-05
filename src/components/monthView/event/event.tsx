@@ -1,23 +1,27 @@
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useCallback} from 'react';
+import './event.css'
 
-import './eventsList.css';
-import {IDay, IEventModalData} from "../interfaces";
-import {useAppSelector} from "../../../redux/hooks";
-import {selectCurrentMonth} from "../../../redux/reducers/generic/genericSlice";
+import {IEventData} from "../interfaces";
+import {useAppDispatch} from "../../../redux/hooks";
+import {modalsTypes, openModal} from "../../../redux/reducers/modals/modalsSlice";
 
-interface IEventsComponent extends IDay {
+interface IEventComponent {
+    eventData: IEventData,
 }
 
-const EventsList: React.FC = () => {
-    const wrapperRef = useRef<HTMLDivElement>(null);
-
+const Event: React.FC<IEventComponent> = ({eventData}) => {
+    const dispatch = useAppDispatch();
+    const clickHandler = useCallback((e: React.MouseEvent<HTMLDivElement>): void => {
+        e.stopPropagation()
+        dispatch(openModal({modalType: modalsTypes.showEvent, modalMetaData: eventData}))
+    }, [dispatch, eventData])
 
     return (
-        <div className='events-wrapper'ref={wrapperRef}>
-
-
+        <div className='event-wrapper' onClick={clickHandler} id={eventData.id}>
+            <p>{eventData.startTime.hours}:{eventData.startTime.minutes} <span
+                className={'bold-text'}>{eventData.name}</span></p>
         </div>
     );
 }
 
-export default EventsList;
+export default Event;

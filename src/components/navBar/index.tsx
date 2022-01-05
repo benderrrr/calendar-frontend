@@ -1,47 +1,31 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useMemo } from 'react';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 
-
-import './NavBar.css';
-import {getBackGroundImage} from "../../redux/reducers/generic/genericSlice";
-import {AppDispatch} from "../../redux/store";
+import './index.css';
+import { Button, Tooltip } from '@mui/material';
+import MonthSelector from "./monthSelector/monthSelector";
+import {setCurrentMonth} from "../../redux/reducers/calendar/calendarSlice";
 import {useAppDispatch} from "../../redux/hooks";
-import {listenForOutsideClicks} from "../../utils/generic";
 
-const NavBar: React.FC = () => {
-    const [isColorPicker, setIsColorPicker] = useState<boolean>(false)
-    const [listening, setListening] = useState<boolean>(false);
-    const [readyForSubmitColor, setReadyForSubmitColor] = useState<boolean>(true)
-    const [color, setColor] = useState<string>(localStorage.getItem('bgColor') || "#FFF")
-    const nodeRef = useRef<HTMLDivElement>(null)
-    const colorChooserRef = useRef<HTMLDivElement>(null)
-    const dispatch: AppDispatch = useAppDispatch()
-
-    useEffect(listenForOutsideClicks(
-        listening,
-        setListening,
-        colorChooserRef,
-        setIsColorPicker,
-    ));
-
-    const changeColorHandler = (color: string): void => {
-        setColor(color)
-        localStorage.setItem('bgColor', color)
-    }
-
-    useEffect(() => {
-        readyForSubmitColor && dispatch(getBackGroundImage(color.slice(1)))
-    }, [dispatch, color, readyForSubmitColor])
+const Index: React.FC = () => {
+    const todayTooltip = useMemo<string>(() => {
+        const today = new Date();
+        return today.toLocaleDateString(navigator.language, {weekday: 'long', day: 'numeric', month: 'long'})
+    }, [])
+    const dispatch = useAppDispatch();
 
     return (
         <nav className='nav-wrapper'>
-
             <div className='logo'>
-                <EventNoteIcon/>
+                <EventNoteIcon />
                 <span>Calendar</span>
             </div>
+            <Tooltip title={todayTooltip}>
+                <Button variant="outlined" onClick={() => dispatch(setCurrentMonth(new Date()))}>Today</Button>
+            </Tooltip>
+            <MonthSelector/>
         </nav>
     );
 }
 
-export default NavBar;
+export default Index;

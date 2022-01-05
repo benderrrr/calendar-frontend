@@ -1,4 +1,13 @@
-export const generateId = (length: number) => {
-    const symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    return Array.apply(null, Array(length)).map(() => symbols.charAt(Math.floor(Math.random() * symbols.length))).join('');
+import React, {useState} from "react";
+
+export const useInput = (initValue: string = '') => {
+    const [value, setValue] = useState<string>(initValue)
+    const onChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setValue(e.target.value)
+    }
+
+    return {
+        value,
+        onChange
+    }
 }
