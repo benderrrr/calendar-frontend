@@ -1,0 +1,30 @@
+.nav-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-right: 30px;
+}
+
+.logo svg {
+  height: 40px;
+  width: 40px;
+}
+
+.logo span {
+  font-size: 22px;
+  line-height: 24px;
+  color: #5f6368;
+}
+
+.today-button {
+  text-transform: none;
+}
