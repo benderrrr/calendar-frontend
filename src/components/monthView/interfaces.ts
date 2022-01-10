@@ -8,8 +8,12 @@ export interface IEventModalData {
     eventData?: IEventData;
 }
 
-export interface IEventData {
-    id?: string;
+export interface IAllEventsModalData {
+    dateKey: string;
+    date: Date;
+}
+
+export interface INewEventDataRequest {
     name: string;
     description: string;
     year: number;
@@ -23,6 +27,10 @@ export interface IEventData {
         hours: number,
         minutes: number
     };
+}
+
+export interface IEventData extends INewEventDataRequest{
+    _id: string;
 }
 
 export interface IIventsStorage {

@@ -42,7 +42,7 @@ const InfoModalButtons: React.FC<IInfoModalButtons> = ({
       title: 'Delete',
       icon: DeleteIcon,
       onClick: () => {
-        event.id && dispatch(deleteEvent({id: event.id, dateKey: getDateKeyFromEvent(event)}))
+        event._id && dispatch(deleteEvent({id: event._id, dateKey: getDateKeyFromEvent(event)}))
         onExit()
       }
     },

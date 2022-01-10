@@ -5,7 +5,7 @@ import {TimePicker} from '@mui/lab';
 import './editEventModal.css';
 import './../event/event.css';
 import {IEventModalData} from "../interfaces";
-import {createEvent} from "../../../redux/reducers/calendar/calendarSlice";
+import {createEvent, editEvent} from "../../../redux/reducers/calendar/calendarSlice";
 import {useAppDispatch} from "../../../redux/hooks";
 import {useInput} from "../../../utils/hooks";
 import {closeModal} from "../../../redux/reducers/modals/modalsSlice";
@@ -32,8 +32,7 @@ const EditEventModal: React.FC<IEventModalData> = ({
   const titleInput = useInput(eventData?.name)
   const descriptionInput = useInput(eventData?.description)
   const saveHandler = useCallback((): void => {
-    dispatch(createEvent({
-      id: eventData?.id,
+    const event = {
       name: titleInput.value.trim() || 'New event',
       description: descriptionInput.value.trim(),
       year: startDate.getFullYear(),
@@ -41,9 +40,10 @@ const EditEventModal: React.FC<IEventModalData> = ({
       day: startDate.getDate(),
       startTime: {hours: startDate.getHours(), minutes: startDate.getMinutes()},
       endTime: {hours: endDate.getHours(), minutes: endDate.getMinutes()},
-    }))
+    }
+    dispatch(eventData?._id ? editEvent({...event, _id: eventData._id})  : createEvent(event))
     dispatch(closeModal())
-  }, [dispatch, eventData?.id, titleInput.value, descriptionInput.value, startDate, endDate])
+  }, [titleInput.value, descriptionInput.value, startDate, endDate, dispatch, eventData?._id])
 
   return (
     <ClickAwayListener onClickAway={() => dispatch(closeModal())}>

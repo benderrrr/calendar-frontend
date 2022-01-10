@@ -11,7 +11,7 @@ const MAX_HEIGHT = 331
 const WIDTH = 400
 
 const EventInfoModal: React.FC<{ event: IEventData }> = ({event}) => {
-  const anchorEl = useMemo<HTMLElement | null>(() => event.id ? document.getElementById(event.id) : null, [event.id]);
+  const anchorEl = useMemo<HTMLElement | null>(() => event._id ? document.getElementById(event._id) : null, [event._id]);
   const dispatch = useAppDispatch();
 
   return (

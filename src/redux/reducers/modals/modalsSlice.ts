@@ -1,13 +1,14 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {RootState} from "../../store";
-import {IEventData, IEventModalData} from "../../../components/monthView/interfaces";
+import {IAllEventsModalData, IEventData, IEventModalData} from "../../../components/monthView/interfaces";
 
 export enum modalsTypes {
   editEvent = 'editEvent',
   showEvent = 'showEvent',
+  allEvents = 'allEvents',
 }
 
-export type modalMetaDataType = IEventModalData | IEventData | null
+export type modalMetaDataType = IAllEventsModalData | IEventModalData | IEventData | null
 
 export interface ModalState {
   modalType: modalsTypes | null;
@@ -25,8 +26,8 @@ export const modalsSlice = createSlice({
   initialState,
   reducers: {
     openModal: (state, action: PayloadAction<{ modalType: modalsTypes, modalMetaData: modalMetaDataType }>) => {
-      state.modalType = !!state.modalType ? null : action.payload.modalType
-      state.modalMetaData = !!state.modalMetaData ? null : action.payload.modalMetaData
+      state.modalType = action.payload.modalType
+      state.modalMetaData = action.payload.modalMetaData
     },
     closeModal: (state) => {
       state.modalType = null

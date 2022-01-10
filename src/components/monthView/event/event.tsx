@@ -17,7 +17,7 @@ const Event: React.FC<IEventComponent> = ({eventData}) => {
     }, [dispatch, eventData])
 
     return (
-        <div className='event-wrapper' onClick={clickHandler} id={eventData.id}>
+        <div className='event-wrapper' onClick={clickHandler} id={eventData._id}>
             <p>{eventData.startTime.hours}:{eventData.startTime.minutes} <span
                 className={'bold-text'}>{eventData.name}</span></p>
         </div>

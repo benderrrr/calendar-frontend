@@ -1,7 +1,7 @@
-import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, isAnyOf, PayloadAction} from '@reduxjs/toolkit';
 import {AppThunk, RootState} from '../../store';
-import {IDay, IEventData, IIventsStorage} from "../../../components/monthView/interfaces";
-import {fetchEvents, saveEvent, fetchDeleteEvent} from "./calendarAPI";
+import {IDay, IEventData, INewEventDataRequest, IIventsStorage} from "../../../components/monthView/interfaces";
+import {fetchEvents, fetchSaveEvent, fetchDeleteEvent, fetchEditEvent} from "./calendarAPI";
 import {getDateKeyFromEvent} from "../../../utils/generic";
 import {closeModal} from "../modals/modalsSlice";
 
@@ -21,13 +21,6 @@ const initialState: GenericState = {
   events: {}
 }
 
-/*export const getBackGroundImage = createAsyncThunk(
-  'calendar/fetchBackgroundImage',
-  async (color: string) => {
-    const response = await fetchBackgroundImage(color);
-    return response.uri;
-  }
-);*/
 
 export const calendarSlice = createSlice({
   name: 'counter',
@@ -42,23 +35,28 @@ export const calendarSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // .addCase(createEvent.pending, (state) => {
-      //   state.backgroundImageStatus = statuses.LOADING
-      // })
-      .addCase(createEvent.fulfilled, (state, action) => {
-        const dateKey = getDateKeyFromEvent(action.payload)
-        if (action.payload.id) {
-          state.events[dateKey] = {...state.events[dateKey], [action.payload.id]: action.payload}
-        }
-      })
-      .addCase(getEvents.fulfilled, (state, action) => {
-        if (Object.keys(action.payload).length) {
-          state.events = action.payload
+      .addCase(getEvents.fulfilled, (state, action: PayloadAction<IEventData[]>) => {
+        if (action.payload.length) {
+          const events: IIventsStorage = action.payload.reduce((acc, event) => {
+            const dataKey = getDateKeyFromEvent(event)
+            return {
+              ...acc,
+              // @ts-ignore
+              [dataKey]: {...acc[dataKey], [event._id]: event}
+            }
+          }, {})
+          state.events = events
         }
       })
       .addCase(deleteEvent.fulfilled, (state, action: PayloadAction<{ id: string, dateKey: string }>) => {
         const newEvents = {...state.events}
         delete newEvents[action.payload.dateKey][action.payload.id]
+      })
+      .addMatcher(isAnyOf (editEvent.fulfilled, createEvent.fulfilled), (state, action: PayloadAction<IEventData>) => {
+        const dateKey = getDateKeyFromEvent(action.payload)
+        if (action.payload._id) {
+          state.events[dateKey] = {...state.events[dateKey], [action.payload._id]: action.payload}
+        }
       });
   },
 });
@@ -117,18 +115,25 @@ export const setCurrentMonth = (date: Date): AppThunk => (
   dispatch(getEvents({ start: days[0].date, end: days[days.length - 1].date }));
 };
 
-export const createEvent = createAsyncThunk(
-    'calendar/saveEvent',
+export const editEvent = createAsyncThunk(
+    'calendar/fetchEditEvent',
     async (event: IEventData) => {
-      return await saveEvent(event);
+      return (await fetchEditEvent(event)).event;
+    }
+);
+
+export const createEvent = createAsyncThunk(
+    'calendar/fetchSaveEvent',
+    async (event: INewEventDataRequest) => {
+      return (await fetchSaveEvent(event)).event;
     }
 );
 
 export const getEvents = createAsyncThunk(
     'calendar/fetchEvents',
     async (payload: {start: Date, end: Date}) => {
-      const response = await fetchEvents(payload.start, payload.end);
-      return response.data;
+      const result = await fetchEvents(payload.start, payload.end);
+      return result.events
     }
 );
 

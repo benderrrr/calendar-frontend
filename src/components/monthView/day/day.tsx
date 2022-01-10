@@ -50,7 +50,7 @@ const Day: React.FC<IDayComponent> = ({
       <h2 className={`date${isDayFromCurrentMonth ? ' current-month' : ''}${isToday ? ' today' : ''}`}>
         {monthDay}
       </h2>
-      <EventsList dateKey={dateKey}/>
+      <EventsList dateKey={dateKey} date={date}/>
     </div>
   );
 }
