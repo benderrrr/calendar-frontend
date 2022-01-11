@@ -10,6 +10,6 @@ export const makeTwoDigit = (value: string | number): string => {
     return `${numberValue < 10 ? '0' : ''}${numberValue}`
 }
 
-export const getDateKeyFromEvent = (event: IEventData): string => [event.year, makeTwoDigit(event.month), makeTwoDigit(event.day)].join('')
+export const getDateKeyFromEvent = (event: IEventData): number => Number([event.year, makeTwoDigit(event.month), makeTwoDigit(event.day)].join(''))
 
-export const getDateKeyFromDate = (date: Date): string => [date.getFullYear(), makeTwoDigit(date.getMonth()), makeTwoDigit(date.getDate())].join('')
+export const getDateKeyFromDate = (date: Date): number => Number([date.getFullYear(), makeTwoDigit(date.getMonth()), makeTwoDigit(date.getDate())].join(''))

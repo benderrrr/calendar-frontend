@@ -21,7 +21,7 @@ const EditEventModal: React.FC<IEventModalData> = ({
                                                      date, dateKey, eventData
                                                    }) => {
   const dispatch = useAppDispatch();
-  const anchorEl = useMemo<HTMLElement | null>(() => document.getElementById(dateKey), [dateKey]);
+  const anchorEl = useMemo<HTMLElement | null>(() => document.getElementById(dateKey.toString()), [dateKey]);
   const [startDate, setStartDate] = useState<Date>(getNewDate(date, eventData?.startTime.hours || 11, eventData?.startTime.minutes || 30));
   const [endDate, setEndDate] = useState<Date>(getNewDate(date, eventData?.endTime.hours || 12, eventData?.endTime.minutes || 30));
   const dateLabel = useMemo<string>(() => date.toLocaleDateString(navigator.language, {

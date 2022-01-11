@@ -37,18 +37,16 @@ export const calendarSlice = createSlice({
     builder
       .addCase(getEvents.fulfilled, (state, action: PayloadAction<IEventData[]>) => {
         if (action.payload.length) {
-          const events: IIventsStorage = action.payload.reduce((acc, event) => {
+          state.events = action.payload.reduce((acc, event) => {
             const dataKey = getDateKeyFromEvent(event)
             return {
               ...acc,
-              // @ts-ignore
               [dataKey]: {...acc[dataKey], [event._id]: event}
             }
-          }, {})
-          state.events = events
+          },  {} as IIventsStorage)
         }
       })
-      .addCase(deleteEvent.fulfilled, (state, action: PayloadAction<{ id: string, dateKey: string }>) => {
+      .addCase(deleteEvent.fulfilled, (state, action: PayloadAction<{ id: string, dateKey: number }>) => {
         const newEvents = {...state.events}
         delete newEvents[action.payload.dateKey][action.payload.id]
       })
@@ -69,7 +67,7 @@ export const selectCurrentMonth = (state: RootState) => ({
   currentYear: state.generic.currentYear,
 });
 export const selectDays = (state: RootState): IDay[]  => state.generic.days;
-export const selectEvents = (state: RootState, dateKey: string): {
+export const selectEvents = (state: RootState, dateKey: number): {
   [key: string]: IEventData
 }  => state.generic.events[dateKey];
 
@@ -139,7 +137,7 @@ export const getEvents = createAsyncThunk(
 
 export const deleteEvent = createAsyncThunk(
     'calendar/deleteEvent',
-    async (payload: {id: string, dateKey: string}) => {
+    async (payload: {id: string, dateKey: number}) => {
       await fetchDeleteEvent(payload.id, payload.dateKey);
       return payload;
     }

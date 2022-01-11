@@ -4,12 +4,12 @@ export interface IDay {
 
 export interface IEventModalData {
     date: Date;
-    dateKey: string;
+    dateKey: number;
     eventData?: IEventData;
 }
 
 export interface IAllEventsModalData {
-    dateKey: string;
+    dateKey: number;
     date: Date;
 }
 
@@ -33,8 +33,6 @@ export interface IEventData extends INewEventDataRequest{
     _id: string;
 }
 
-export interface IIventsStorage {
-    [key: string]: {
-        [key: string]: IEventData
-    }
-}
+type TEvent = Record<string, IEventData>
+
+export type IIventsStorage = Record<number, TEvent>

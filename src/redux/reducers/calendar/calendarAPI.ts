@@ -1,6 +1,5 @@
-import {IEventData, INewEventDataRequest, IIventsStorage} from "../../../components/monthView/interfaces";
-import { httpMethod, request } from "../../../utils/api";
-import {getDateKeyFromDate} from "../../../utils/generic";
+import {IEventData, IIventsStorage, INewEventDataRequest} from "../../../components/monthView/interfaces";
+import {httpMethod, request} from "../../../utils/api";
 
 
 export function fetchSaveEvent(event: INewEventDataRequest) {
@@ -14,7 +13,9 @@ export function fetchEditEvent(event: IEventData) {
 }
 
 export function fetchEvents(start: Date, end: Date) {
-  const url = `http://localhost:4444/api/events/getEvents?startDate=${getDateKeyFromDate(start)}&endDate=${getDateKeyFromDate(end)}`;
+  const url = `
+    http://localhost:4444/api/events/getEvents?startYear=${start.getFullYear()}&startMonth=${start.getMonth()}&startDay=${start.getDate()}&endYear=${end.getFullYear()}&endMonth=${end.getMonth()}&endDay=${end.getDate()}
+  `;
   return request(url, httpMethod.GET);
   /*
     const storageEvents = localStorage.getItem('events')
@@ -30,7 +31,7 @@ export function fetchEvents(start: Date, end: Date) {
     );*/
 }
 
-export function fetchDeleteEvent(id: string, dateKey: string) {
+export function fetchDeleteEvent(id: string, dateKey: number) {
   const storageEvents = localStorage.getItem('events')
   const allEvents: IIventsStorage = storageEvents ? JSON.parse(storageEvents) : []
   delete allEvents[dateKey][id]

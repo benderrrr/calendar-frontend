@@ -30,7 +30,7 @@ const Day: React.FC<IDayComponent> = ({
     const todayMonthDay = today.getDate();
     return monthDay === todayMonthDay && todayMonth === month && todayYear === date.getFullYear();
   }, [date, monthDay, month]);
-  const dateKey = useMemo<string>(() => getDateKeyFromDate(date), [date])
+  const dateKey = useMemo<number>(() => getDateKeyFromDate(date), [date])
 
   const onClickHandler = useCallback((): void => {
     dispatch(openModal({modalType: modalsTypes.editEvent, modalMetaData: {date, dateKey}}))
@@ -41,7 +41,7 @@ const Day: React.FC<IDayComponent> = ({
 
 
   return (
-    <div className='day-wrapper' onClick={onClickHandler} ref={wrapperRef} style={{gridTemplateRows}} id={dateKey}>
+    <div className='day-wrapper' onClick={onClickHandler} ref={wrapperRef} style={{gridTemplateRows}} id={dateKey.toString()}>
       {withDayName && (
         <span className='week-day'>
                      {date.toLocaleDateString(navigator.language, {weekday: 'short'})}

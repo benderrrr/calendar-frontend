@@ -13,7 +13,7 @@ const WIDTH = 260
 
 const AllEventsModal: React.FC<IAllEventsModalData> = ({date, dateKey}) => {
   const events = useAppSelector(state => selectEvents(state, dateKey));
-  const anchorEl = useMemo<HTMLElement | null>(() => document.getElementById(dateKey), [dateKey]);
+  const anchorEl = useMemo<HTMLElement | null>(() => document.getElementById(dateKey.toString()), [dateKey]);
   const dispatch = useAppDispatch();
 
   return (

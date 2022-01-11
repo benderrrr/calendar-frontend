@@ -8,7 +8,7 @@ import CaptureResize from "../../hocs/captureResize";
 import {modalsTypes, openModal} from "../../../redux/reducers/modals/modalsSlice";
 
 interface IEventsListComponent {
-  dateKey: string,
+  dateKey: number,
   date: Date,
 }
 
