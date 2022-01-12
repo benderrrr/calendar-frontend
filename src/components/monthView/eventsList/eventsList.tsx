@@ -5,7 +5,7 @@ import Event from "../event/event";
 import {selectEvents} from "../../../redux/reducers/calendar/calendarSlice";
 import {useAppDispatch, useAppSelector} from "../../../redux/hooks";
 import CaptureResize from "../../hocs/captureResize";
-import {modalsTypes, openModal} from "../../../redux/reducers/modals/modalsSlice";
+import {modalsTypes, openModal, selectModalData} from "../../../redux/reducers/modals/modalsSlice";
 
 interface IEventsListComponent {
   dateKey: number,
@@ -14,6 +14,7 @@ interface IEventsListComponent {
 
 const EventsList: React.FC<IEventsListComponent> = ({dateKey, date}) => {
   const dispatch = useAppDispatch();
+  const {modalType} = useAppSelector(selectModalData);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const events = useAppSelector(state => selectEvents(state, dateKey));
   const eventsListArray = useMemo(() => events && Object.values(events), [events]);
@@ -35,7 +36,7 @@ const EventsList: React.FC<IEventsListComponent> = ({dateKey, date}) => {
               <Event eventData={event} key={event._id}/>
             )}
             {!!overCountEvents && (
-              <div className={'event-wrapper'} onClick={moreEventsClickHandler}>
+              <div className={'event-wrapper'} onClick={modalType ? () => null : moreEventsClickHandler}>
                 <p className={'bold-text'}>{overCountEvents} more</p>
               </div>
             )}

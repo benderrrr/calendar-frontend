@@ -6,7 +6,7 @@ import {useAppDispatch, useAppSelector} from "../../../redux/hooks";
 import {selectCurrentMonth} from "../../../redux/reducers/calendar/calendarSlice";
 import EventsList from "../eventsList/eventsList";
 import {getDateKeyFromDate} from "../../../utils/generic";
-import {modalsTypes, openModal} from '../../../redux/reducers/modals/modalsSlice';
+import {modalsTypes, openModal, selectModalData} from '../../../redux/reducers/modals/modalsSlice';
 
 interface IDayComponent extends IDay {
   index: number,
@@ -22,6 +22,7 @@ const Day: React.FC<IDayComponent> = ({
 
   const dispatch = useAppDispatch();
   const currentDate = useAppSelector(selectCurrentMonth);
+  const {modalType} = useAppSelector(selectModalData);
   const isDayFromCurrentMonth = useMemo<boolean>(() => currentDate.currentMonth === month, [month, currentDate.currentMonth]);
   const isToday = useMemo<boolean>(() => {
     const today = new Date();
@@ -41,7 +42,7 @@ const Day: React.FC<IDayComponent> = ({
 
 
   return (
-    <div className='day-wrapper' onClick={onClickHandler} ref={wrapperRef} style={{gridTemplateRows}} id={dateKey.toString()}>
+    <div className='day-wrapper' onClick={modalType ? () => null : onClickHandler} ref={wrapperRef} style={{gridTemplateRows}} id={dateKey.toString()}>
       {withDayName && (
         <span className='week-day'>
                      {date.toLocaleDateString(navigator.language, {weekday: 'short'})}
