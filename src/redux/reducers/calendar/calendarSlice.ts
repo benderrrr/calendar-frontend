@@ -3,7 +3,6 @@ import {AppThunk, RootState} from '../../store';
 import {IDay, IEventData, INewEventDataRequest, IIventsStorage} from "../../../components/monthView/interfaces";
 import {fetchEvents, fetchSaveEvent, fetchDeleteEvent, fetchEditEvent} from "./calendarAPI";
 import {getDateKeyFromEvent} from "../../../utils/generic";
-import {closeModal} from "../modals/modalsSlice";
 
 export interface GenericState {
   currentMonthDate: Date | null;
@@ -107,7 +106,6 @@ export const setCurrentMonth = (date: Date): AppThunk => (
     }
   }
   const days = [...daysFromPrevMonth(), ...daysFromCurrentMonth(), ...daysFromNextMonth()]
-  dispatch(closeModal());
   dispatch(changeCurrentMonth({ date, days }));
   dispatch(getEvents({ start: days[0].date, end: days[days.length - 1].date }));
 };
